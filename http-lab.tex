@@ -1,0 +1,210 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\title{ECS 152A Programming 2}
+\author{
+  Daniel Phan \\
+  ID 914831996 \\
+  Section A04
+  \and
+  Noah Tarr \\
+  ID 917286014 \\
+  Section A02
+}
+\date{Due: 03/07/2021}
+
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+\setlength{\topmargin}{0in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\textwidth}{6.5in}
+\setlength{\textheight}{9.25in}
+\setlength{\parindent}{0in}
+\setlength{\parskip}{2mm}
+
+\begin{document}
+
+\maketitle
+
+\section{HTTP Wireshark Lab}
+
+\subsection{The Basic HTTP GET/Response Interaction}
+
+\begin{enumerate}
+\item Is your browser running HTTP version 1.0 or 1.1?  What version of HTTP is
+  the server running?
+  \begin{itemize}
+  \item Both my browser and the server are running HTTP version 1.1.
+  \item \includegraphics[width=\textwidth]{img/ws-browser-http-version}
+  \item \includegraphics[width=\textwidth]{img/ws-server-http-version}
+  \end{itemize}
+\item What languages (if any) does your browser indicate that it can accept to
+  the server?
+  \begin{itemize}
+  \item My browser indicates that it accepts US English.
+  \item \includegraphics[width=\textwidth]{img/ws-browser-language}
+  \end{itemize}
+\item What is the IP address of your computer?  Of the gaia.cs.umass.edu server?
+  \begin{itemize}
+  \item My IP address is 192.168.1.127, while the server's IP address is
+    128.119.245.12.
+  \item \includegraphics[width=\textwidth]{img/ws-my-ip}
+  \item \includegraphics[width=\textwidth]{img/ws-server-ip}
+  \end{itemize}
+\item What is the status code returned from the server to your browser?
+  \begin{itemize}
+  \item The server returned $200$ for the HTML file and $404$ for favico.ico.
+  \item \includegraphics[width=\textwidth]{img/ws-status-code-1}
+  \item \item \includegraphics[width=\textwidth]{img/ws-status-code-2}
+  \end{itemize}
+\item When was the HTML file that you are retrieving last modified at the
+  server?
+  \begin{itemize}
+  \item It was last modified on March 3, 2021, at 06:59:01 GMT.\
+  \item \includegraphics[width=\textwidth]{img/ws-last-modified}
+  \end{itemize}
+\item How many bytes of content are being returned to your browser?
+  \begin{itemize}
+  \item There were $128$ bytes for the HTML file, and $209$ bytes for
+    favico.ico.
+  \item \includegraphics[width=\textwidth]{img/ws-content-size-1}
+  \item \includegraphics[width=\textwidth]{img/ws-content-size-2}
+  \end{itemize}
+\item By inspecting the raw data in the packet content window, do you see any
+  headers within the data that are not displayed in the packet-listing window?  If
+  so, name one.
+  \begin{itemize}
+  \item I do not see any headers that are not displayed.
+  \item \includegraphics[width=\textwidth]{img/ws-raw-data-1}
+  \item \includegraphics[width=\textwidth]{img/ws-raw-data-2}
+  \item \includegraphics[width=\textwidth]{img/ws-raw-data-3}
+  \item \includegraphics[width=\textwidth]{img/ws-raw-data-4}
+  \end{itemize}
+\end{enumerate}
+
+
+\subsection{The HTTP CONDITIONAL GET/response interaction}
+
+\begin{enumerate}
+  \setcounter{enumi}{7}
+\item Inspect the contents of the first HTTP GET request from your browser to
+  the server.  Do you see an ``IF-MODIFIED-SINCE'' line in the HTTP GET?
+  \begin{itemize}
+  \item I do not see an ``IF-MODIFIED-SINCE'' line in the HTTP GET.\
+  \item \includegraphics[width=\textwidth]{img/ws-if-modified-since-1}
+  \end{itemize}
+\item Inspect the contents of the server response. Did the server explicitly
+  return the contents of the file?  How can you tell?
+  \begin{itemize}
+  \item The server explicitly returned the contents.  I can tell because the
+    response contains the HTML file content, and content fields like
+    ``Content-Type'' and ``Content Length'' are set.
+  \item \includegraphics[width=\textwidth]{img/ws-html-contents}
+  \item \includegraphics[width=\textwidth]{img/ws-html-content-type}
+  \end{itemize}
+\item Now inspect the contents of the second HTTP GET request from your browser
+  to the server.  Do you see an ``IF-MODIFIED-SINCE:'' line in the HTTP GET?  If
+  so, what information follows the ``IF-MODIFIED-SINCE:'' header?
+  \begin{itemize}
+  \item There is an ``If-Modified-Since'' line, and it contains ``Wed, 03 Mar
+    2021 06:59:01 GMT''.
+  \item \includegraphics[width=\textwidth]{img/ws-if-modified-since-2}
+  \end{itemize}
+\item What is the HTTP status code and phrase returned from the server in
+  response to this second HTTP GET?  Did the server explicitly return the
+  contents of the file?
+  \begin{itemize}
+  \item The HTTP status code is $304$ and the response phrase is ``Not
+    Modified''.  The server did not explicitly return the contents of the file,
+    as none of the signs described in the response to question 9 appeared
+    here.
+  \item \includegraphics[width=\textwidth]{img/ws-conditional-status-phrase}
+  \end{itemize}
+\end{enumerate}
+
+
+\subsection{Retrieving Long Documents}
+
+\begin{enumerate}
+  \setcounter{enumi}{11}
+\item How many HTTP GET request messages did your browser send?  Which packet
+  number in the trace contains the GET message for the Bill or Rights?
+  \begin{itemize}
+  \item My browser sent one HTTP GET request.  The packet number was $63$.
+  \item \includegraphics[width=\textwidth]{img/ws-long-get}
+  \end{itemize}
+\item Which packet number in the trace contains the status code and phrase
+  associated with the response to the HTTP GET request?
+  \begin{itemize}
+  \item The packet number is $65$.  We see that the response was broken into $2$
+    TCP segments.  The raw data of the first segment, packet $65$, is
+    highlighted in blue, and we see the HTTP status code and phrase at the top
+    of the raw data.
+  \item \includegraphics[width=\textwidth]{img/ws-packet-number-long-doc}
+  \end{itemize}
+\item What is the status code and phrase in the response?
+  \begin{itemize}
+  \item The status code is $200$, and the phrase is ``OK''.
+  \item \includegraphics[width=\textwidth]{img/ws-long-doc-status-code-phrase}
+  \end{itemize}
+\item How many data-containing TCP segments were needed to carry the single HTTP
+  response and the text of the Bill of Rights?
+  \begin{itemize}
+  \item $2$ data-containing TCP segments were needed.
+  \item \includegraphics[width=\textwidth]{img/ws-long-doc-tcp-count}
+  \end{itemize}
+\end{enumerate}
+
+
+\subsection{HTML Documents with Embedded Objects}
+
+\begin{enumerate}
+  \setcounter{enumi}{15}
+\item How many HTTP GET request messages did your browser send?  To which
+  Internet addresses were these GET requests sent?
+  \begin{itemize}
+  \item $3$ HTTP GET requests were sent.  The first two went to
+    128.119.245.12 (\texttt{gaia.cs.umass.edu}), while the third went to
+    178.79.137.164 (\texttt{kurose.cslash.net}).
+  \item \includegraphics[width=\textwidth]{img/ws-embed-get-count}
+  \item \includegraphics[width=\textwidth]{img/ws-embed-ip-1}
+  \item \includegraphics[width=\textwidth]{img/ws-embed-host-1}
+  \item \includegraphics[width=\textwidth]{img/ws-embed-ip-2}
+  \item \includegraphics[width=\textwidth]{img/ws-embed-host-2}
+  \item \includegraphics[width=\textwidth]{img/ws-embed-ip-3}
+  \item \includegraphics[width=\textwidth]{img/ws-embed-host-3}
+  \end{itemize}
+\item Can you tell whether your browser downloaded the two images serially, or
+  whether they were downloaded from the two web sites in parallel?  Explain.
+  \begin{itemize}
+  \item The images were downloaded serially.  The last packet for
+    \texttt{pearson.png} (packet $99$) arrived before the GET request for
+    \texttt{8E\_cover\_small.jpg} (packet $104$) was sent.
+  \item \includegraphics[width=\textwidth]{img/ws-embed-order}
+  \end{itemize}
+\end{enumerate}
+
+
+\subsection{HTTP Authentication}
+
+\begin{enumerate}
+  \setcounter{enumi}{17}
+\item What is the server’s response (status code and phrase) in response to the
+  initial HTTP GET message from your browser?
+  \begin{itemize}
+  \item The server responded with $401$ and ``Unauthorized''.
+  \item \includegraphics[width=\textwidth]{img/ws-auth-1}
+  \end{itemize}
+\item When your browser’s sends the HTTP GET message for the second time, what
+  new field is included in the HTTP GET message?
+  \begin{itemize}
+  \item The ``Authorization'' and ``Cache-Control'' fields are new.
+  \item \includegraphics[width=\textwidth]{img/ws-auth-new-fields-1}
+  \item \includegraphics[width=\textwidth]{img/ws-auth-new-fields-2}
+  \end{itemize}
+\end{enumerate}
+
+\end{document}
