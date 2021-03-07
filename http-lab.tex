@@ -1,6 +1,7 @@
 \documentclass[11pt]{article}
 
 \usepackage{amsmath}
+\usepackage{enumitem}
 \usepackage{graphicx}
 
 \title{ECS 152A Programming 2}
@@ -85,7 +86,6 @@
   \end{itemize}
 \end{enumerate}
 
-
 \subsection{The HTTP CONDITIONAL GET/response interaction}
 
 \begin{enumerate}
@@ -125,7 +125,6 @@
   \end{itemize}
 \end{enumerate}
 
-
 \subsection{Retrieving Long Documents}
 
 \begin{enumerate}
@@ -158,7 +157,6 @@
   \end{itemize}
 \end{enumerate}
 
-
 \subsection{HTML Documents with Embedded Objects}
 
 \begin{enumerate}
@@ -187,7 +185,6 @@
   \end{itemize}
 \end{enumerate}
 
-
 \subsection{HTTP Authentication}
 
 \begin{enumerate}
@@ -204,6 +201,72 @@
   \item The ``Authorization'' and ``Cache-Control'' fields are new.
   \item \includegraphics[width=\textwidth]{img/ws-auth-new-fields-1}
   \item \includegraphics[width=\textwidth]{img/ws-auth-new-fields-2}
+  \end{itemize}
+\end{enumerate}
+
+\section{DNS and \texttt{dig}}
+
+\begin{enumerate}[label=(\alph*)]
+\item Starting with a root DNS server (from one of the root servers
+  [a-m].root-servers.net), initiate a sequence of queries for the IP address for
+  your department’s Web server by using dig. Show the list of the names of DNS
+  servers in the delegation chain in answering your query.
+  \begin{itemize}
+  \item I followed the DNS servers \texttt{a.root-servers.net} $\rightarrow$
+    \texttt{a.edu-servers.net} $\rightarrow$ \texttt{dns-two.ucdavis.edu}.  The IP
+    addresses are listed in the last screenshot under ``ANSWER SECTION''.
+  \item \includegraphics[width=0.7\textwidth]{img/dig-ucd-1}
+  \item \includegraphics[width=0.7\textwidth]{img/dig-ucd-2}
+  \item \includegraphics[width=0.7\textwidth]{img/dig-ucd-3}
+  \end{itemize}
+\item Repeat part (a) for several popular Web sites, such as google.com,
+  yahoo.com, or amazon.com
+  \begin{itemize}
+  \item google.com
+    \begin{itemize}
+    \item I followed the DNS servers \texttt{a.root-servers.net} $\rightarrow$
+      \texttt{a.gtld-servers.net} $\rightarrow$ \texttt{ns2.google.com} to get
+      the IP address 216.58.194.174.
+    \item \includegraphics[width=0.7\textwidth]{img/dig-google-1}
+    \item \includegraphics[width=0.7\textwidth]{img/dig-google-2}
+    \item \includegraphics[width=0.7\textwidth]{img/dig-google-3}
+    \end{itemize}
+  \item yahoo.com
+    \begin{itemize}
+    \item I followed the DNS servers \texttt{a.root-servers.net} $\rightarrow$
+      \texttt{a.gtld-servers.net} $\rightarrow$ \texttt{ns1.yahoo.com}.  The IP
+      addresses are listed in the last screenshot under ``ANSWER SECTION''.
+    \item \includegraphics[width=0.7\textwidth]{img/dig-yahoo-1}
+    \item \includegraphics[width=0.7\textwidth]{img/dig-yahoo-2}
+    \item \includegraphics[width=0.7\textwidth]{img/dig-yahoo-3}
+    \end{itemize}
+  \item github.com
+    \begin{itemize}
+    \item I followed the DNS servers \texttt{a.root-servers.net} $\rightarrow$
+      \texttt{e.gtld-servers.net} $\rightarrow$ \texttt{ns-520.awsdns-01.net} to get
+      the IP address 192.30.255.112.
+    \item \includegraphics[width=0.7\textwidth]{img/dig-google-1}
+    \item \includegraphics[width=0.7\textwidth]{img/dig-google-2}
+    \item \includegraphics[width=0.7\textwidth]{img/dig-google-3}
+    \end{itemize}
+  \item messenger.com
+    \begin{itemize}
+    \item I followed the DNS servers \texttt{a.root-servers.net} $\rightarrow$
+      \texttt{e.gtld-servers.net} $\rightarrow$ \texttt{a.ns.facebook.com} to get
+      the IP address 69.171.250.15.
+    \item \includegraphics[width=0.7\textwidth]{img/dig-messenger-1}
+    \item \includegraphics[width=0.7\textwidth]{img/dig-messenger-2}
+    \item \includegraphics[width=0.7\textwidth]{img/dig-messenger-3}
+    \end{itemize}
+  \item whitehouse.gov
+    \begin{itemize}
+    \item I followed the DNS servers \texttt{a.root-servers.net} $\rightarrow$
+      \texttt{a.gov-servers.net} $\rightarrow$ \texttt{use6.akam.net} to get
+      the IP address 23.219.242.151.
+    \item \includegraphics[width=0.7\textwidth]{img/dig-whitehouse-1}
+    \item \includegraphics[width=0.7\textwidth]{img/dig-whitehouse-2}
+    \item \includegraphics[width=0.7\textwidth]{img/dig-whitehouse-3}
+    \end{itemize}
   \end{itemize}
 \end{enumerate}
 
