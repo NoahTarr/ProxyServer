@@ -204,6 +204,33 @@
   \end{itemize}
 \end{enumerate}
 
+
+\break
+\section{Web Proxy Cache}
+    This TCP Proxy Server stores its cached websites in a local directory that gets created inside the working directory of the program when the first request is accepted and processed. The main loop waits for the TCP server to receive a client request and has a timeout of 1 second. Its in a try catch nested in an infinite loop to enable the user to interrupt the program with a keyboard interrupt like "ctrl+c". Without implementing this loop and putting a timeout on the TCP Server socket, the proxy server has to be forcubly shut down because the sockets are blocking. When a request is received from the client, a client server socket is generated directly from the tcpServSock.accept() function. The message is then decoded and the url, filename and host are extracted from the message. The program then checks the "cached" directory to see if the received file request already exists.\\ 
+    
+    If it exists, the request does not get forwarded to the host server and instead simply responds with the contents of the locally cached file. This cached response shows significantly increased response speeds as compared to true requests from host servers. The responses are stored locally in files, so restarting the program or your computer will not destroy the cached files. They have to either be deleted manually or by the program when it starts. \\
+    
+    If the file does not exist in the local cache, a new socket is created on the Proxy Server and connected to the host domain on port 80. A new request is built using  the filename and host previously extracted from the client request message. The message is sent in the form "GET \textit{filename} HTTP/1.1 Host: \textit{hostDomain} Connection: Close". The "Close" connection is to force the connection to close rather then the default "keep\_open" Connection type. Once this message is built  and sent to the host, the socket waits until it receives a response. Once received, the response is first sent back to the client server to reduce the delay, then the response is stored in a local file in the "cached" directory using the same "filename". Once the message has been both stored in the final and sent to the client then host and client sockets are shutdown and the process repeats. \\
+    
+    I have also ensured proper exception handling and a way to compare cached vs noncached times. The times are compared using a dictionary that is created on program run. It stores the time it takes to send a response to the client from the point the connection is created between the client and proxy until a response message is sent using the requests filename as a key. When the server is killed, the results of this dictionary are printed to the console. A bar graph comparing load times can be seen below. \\
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/proxy_server_load_times_graph.png}
+    \caption{Proxy Server Load Times for Cached and Non Cached Requests}
+    \label{fig:my_label}
+\end{figure}
+
+\begin{center}
+  \item \includegraphics[width=0.8\textwidth]{img/proxy_server_terminal.PNG}
+  \item \includegraphics[width=0.8\textwidth]{img/proxy_server_terminal_on_exit.PNG}
+  \break
+  \item \includegraphics[width=0.8\textwidth]{img/local_cached_directory.PNG}
+  \item \includegraphics[width=0.8\textwidth]{img/cached_website_html_code.PNG}
+\end{center}
+
+\break
 \section{DNS and \texttt{dig}}
 
 \begin{enumerate}[label=(\alph*)]

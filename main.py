@@ -104,7 +104,7 @@ if __name__ == '__main__':
 			messageDecoded = message.decode()
 			
 			# Ignore connection attempts from google or spotify
-			if len(message) == 0 or messageDecoded.find('google') != -1 or messageDecoded.find('spotify') != -1:
+			if len(message) == 0 or messageDecoded.find('google') != -1 or messageDecoded.find('spotify') != -1 or messageDecoded.find('127.0.0.1') != -1:
 				tcpCliSock.shutdown(1)
 				tcpCliSock.close()
 				continue
@@ -112,7 +112,9 @@ if __name__ == '__main__':
 			message = message.decode()
 			print(message)
 			# Extract the filename from the given message
-			url, filename, hostn, portn = getURLAndFile(message)
+			url, filename, hostn, _ = getURLAndFile(message)
+			# I was obtaining portn from the incoming url, but it failed more often then just using port 80.
+			portn = 80
 			print("url: " + url)
 			print("filename: " + filename)
 			print("host: " + hostn)
@@ -127,28 +129,30 @@ if __name__ == '__main__':
 				f = open(filePath, "rb")
 				outputdata = f.readlines()
 				if len(outputdata) == 0:
+					# Remove the file because it is empty
+					os.remove(filePath)
 					raise FileNotFoundError("File is empty in cache")
 				fileExist = True
+				# This is no longer needed b/c I stored the original response in the file with the website data
 				# ProxyServer finds a cache hit and generates a response message
-				tcpCliSock.send("HTTP/1.1 200 OK\r\n".encode())
-				tcpCliSock.send("Content-Type:text/html\r\n".encode())
+				# tcpCliSock.send("HTTP/1.1 200 OK\r\n".encode())
+				# tcpCliSock.send("Content-Type:text/html\r\n".encode())
 				
-				# TODO send outputdata to client socket
-				# Fill in start.
-				indexOfHTMLStart = 0
-				# for i, d in enumerate(outputdata):
-				# 	if d.find(b"<html>") != -1:
-				# 		indexOfHTMLStart = i
-				# 		break
-				
-				for i in range(indexOfHTMLStart, len(outputdata)):
+				# Send outputdata to client socket
+				for i in range(len(outputdata)):
 					sentCheck = tcpCliSock.sendall(outputdata[i])
 					if sentCheck is not None:
 						raise RuntimeError("socket connection broken")
-				# Fill in end.
 				
-				times[filename]["cached"] = datetime.today().timestamp() - time
+				if filename not in times.keys():
+					times[filename] = {
+						"nonCached": -1,
+						"cached": datetime.today().timestamp() - time
+					}
+				else:
+					times[filename]["cached"] = datetime.today().timestamp() - time
 				print('Read from cache')
+				
 			# Error handling for file not found in cache
 			except (IOError, FileNotFoundError, RuntimeError):
 				if not fileExist:
@@ -156,21 +160,23 @@ if __name__ == '__main__':
 					try:
 						os.makedirs(os.path.dirname(filePath))
 					except OSError as exc:  # Python >2.5
+						# Directory already exists so continue
 						if exc.errno == errno.EEXIST and os.path.isdir(os.path.dirname(filePath)):
 							pass
+						# A file exists with the same name as the directory. Delete the file to resolve
 						elif exc.errno == errno.EEXIST and os.path.isfile(os.path.dirname(filePath)):
 							os.remove(filePath)
 							pass
+						#Unknown error
 						else:
 							raise
-					# TODO Create a socket on the proxyserver
-					# Fill in start.
+						
+						
+					# Create a socket on the proxyserver
 					c = socket(AF_INET, SOCK_STREAM)
-					# Fill in end.
 					
 					try:
-						# TODO Connect the socket to port 80
-						# Fill in start.
+						# Connect the socket to port 80
 						c.connect((hostn, portn))
 						getReq = "GET " + filename.replace(hostn, "") + " HTTP/1.1\r\n"
 						if url[len(url) - 1] == '/':
@@ -180,8 +186,7 @@ if __name__ == '__main__':
 						c.settimeout(60)
 						c.sendall(getReq.encode())
 						
-						# TODO Read the response into buffer
-						# Fill in start.
+						# Read the response into buffer
 						cmessage = []
 						# Continue to receive data until 0 received
 						while 1:
@@ -194,22 +199,23 @@ if __name__ == '__main__':
 							else:
 								c.close()
 								break
-						# Fill in end.
 						
-						# TODO Create a new file in the cache for the requested file.
+						# Create a new file in the cache for the requested file.
 						# Also send the response in the buffer to client socket and the corresponding file in the cache
-						# Fill in start.
 						if len(cmessage) > 0:
 							for m in cmessage:
 								sentCheck = tcpCliSock.sendall(m)
 								if sentCheck is not None:
 									raise RuntimeError("socket connection broken, socket couldn't receive data")
-						
-							times[filename] = {
-								"nonCached": datetime.today().timestamp() - time,
-								"cached": -1
-							}
 							
+							if filename not in times.keys():
+								times[filename] = {
+									"nonCached": datetime.today().timestamp() - time,
+									"cached": -1
+								}
+							else:
+								times[filename]["nonCached"] = datetime.today().timestamp() - time
+								
 							fileobj = open(filePath, "wb")
 							fileobj.flush()
 							fileobj.writelines(cmessage)
@@ -222,20 +228,11 @@ if __name__ == '__main__':
 						if ConnectionResetError:
 							print("Remote Host closed connection. Response failed.")
 				else:
-					# TODO HTTP response message for file not found
-					# Fill in start.
-					print("Server responded with error")
-			
-			# TODO Close the client and the server sockets
-			# Fill in start.
-			tcpCliSock.shutdown(1)
-			tcpCliSock.close()
-		# Fill in end.
+					print("Server responded with error.")
+				tcpCliSock.shutdown(1)
+				tcpCliSock.close()
 	except KeyboardInterrupt:
 		print(json.dumps(times, sort_keys=True, indent=4))
 		print('Exiting')
 		exit(0)
 		# TODO
-		# Fill in start
-		# tcpSerSock.shutdown(1)
-		# tcpSerSock.close()
